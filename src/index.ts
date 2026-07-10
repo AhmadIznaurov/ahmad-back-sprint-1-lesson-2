@@ -1,15 +1,26 @@
 import express from 'express';
-import { setupApp } from './setup-app';
+import cors from 'cors';
+import helmet from 'helmet';
+import dotenv from 'dotenv';
+import driversRouter from './drivers/routers/drivers.router';
+import ridesRouter from './rides/routers/rides.router';
+import testingRouter from './testing/routers/testing.router';
+import { errorHandler } from './core/middlewares/error-handler.middleware';
 
-// создание приложения
+dotenv.config();
+
 const app = express();
-setupApp(app);
+const PORT = process.env.PORT || 3000;
 
-// process — это глобальный объект в Node.js, который содержит информацию о текущем процессе выполнения.
-// process.env — это объект, содержащий все переменные окружения, доступные вашему приложению.
-const PORT = process.env.PORT || 5001;
+app.use(helmet());
+app.use(cors());
+app.use(express.json());
 
-// ф-ия listen - запускает сервер и начинает прослушивать входящие запросы на указанном порту.
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}`);
-});
+app.use('/ht_02/api/blogs', driversRouter);
+app.use('/ht_02/api/posts', ridesRouter);
+app.use('/ht_02/api/testing', testingRouter);
+
+app.use(errorHandler);
+
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+export default app;
